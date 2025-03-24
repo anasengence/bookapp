@@ -18,6 +18,7 @@ class Book(models.Model):
     )
     date_published = models.DateField()
     genre = models.ManyToManyField("Genre")
+    is_featured = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

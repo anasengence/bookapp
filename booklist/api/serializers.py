@@ -29,7 +29,7 @@ class BookSerializer(serializers.ModelSerializer):
         queryset=Author.objects.all(), write_only=True
     )
     author_name = serializers.StringRelatedField(source="author", read_only=True)
-    days_ago_published = serializers.SerializerMethodField()
+    # days_ago_published = serializers.SerializerMethodField()
     genre_details = GenreSerializer(source="genre", many=True, read_only=True)
     genre = serializers.PrimaryKeyRelatedField(
         queryset=Genre.objects.all(), many=True, write_only=True
@@ -37,11 +37,11 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = "__all__"
+        exclude = ["is_featured"]
 
-    def get_days_ago_published(self, obj):
-        days = date.today() - obj.date_published
-        return days.days
+    # def get_days_ago_published(self, obj):
+    #     days = date.today() - obj.date_published
+    #     return days.days
 
     def validate(self, obj):
         if obj["title"] == obj["author"].name:
