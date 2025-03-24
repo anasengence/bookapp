@@ -3,6 +3,8 @@ from datetime import date
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
+
+from booklist.api.filter import BookFilter
 from ..models import Book, Author, Genre
 from rest_framework import viewsets
 from .serializers import BookSerializer, AuthorSerializer, GenreSerializer
@@ -71,6 +73,7 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["date_published"]
+    filterset_class = BookFilter
 
     @action(detail=True, methods=["GET"])
     def stats(self, request, pk=None):

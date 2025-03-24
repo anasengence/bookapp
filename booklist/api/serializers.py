@@ -11,7 +11,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     author_books = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="get_books_detail"
+        many=True, read_only=True, view_name="get-books-detail"
     )
 
     # author_books = serializers.StringRelatedField(many=True, read_only=True)
