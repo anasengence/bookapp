@@ -7,10 +7,10 @@ from rest_framework import generics
 from booklist.api.filter import BookFilter, CustomFilterBackend
 from ..models import Book, Author, Genre
 from rest_framework import viewsets
-from .serializers import BookSerializer, AuthorSerializer, GenreSerializer
+from .serializers import BookSerializer, BookListSerializer, BookDetailSerializer , AuthorSerializer, GenreSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-
+from .pagination import CustomCursorPagination, CustomLimitOffsetPagination, CustomPageNumberPagination
 
 # @api_view(["GET"])
 # def getBooks(request):
@@ -66,14 +66,37 @@ class AuthorViewSet(viewsets.ModelViewSet):
     search_fields = ["name"]
     ordering_fields = ["date_of_birth"]
     ordering = ["date_of_birth"]
+    pagination_class = CustomLimitOffsetPagination
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.all()
+    # queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend, CustomFilterBackend]
     filterset_fields = ["date_published"]
     filterset_class = BookFilter
+    
+    def get_queryset(self):
+        queryset = Book.objects.all().select_related("author").prefetch_related("genre")
+        return queryset
+    
+    def get_pagination_class(self):
+        paginaton_type = self.request.query_params.get("type")
+        if paginaton_type == "cursor":
+            return CustomCursorPagination
+        elif paginaton_type == "page":
+            return CustomPageNumberPagination
+        else:
+            return CustomLimitOffsetPagination
+        
+    pagination_class = property(get_pagination_class)
+    
+    def get_serializer_class(self):
+        if self.action == "list":
+            return BookListSerializer
+        elif self.action == "retrieve":
+            return BookDetailSerializer
+        return BookSerializer
 
     @action(detail=True, methods=["GET"])
     def stats(self, request, pk=None):
@@ -93,5 +116,6 @@ class BookViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    queryset = Genre.objects.all()
+    queryset = Genre.objects.all().prefetch_related("books")
     serializer_class = GenreSerializer
+    pagination_class = CustomPageNumberPagination
