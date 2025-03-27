@@ -2,6 +2,20 @@ from datetime import date
 from rest_framework import serializers
 from ..models import Book, Author, Genre
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["name"] = user.get_full_name()
+        token["email"] = user.email
+        token["is_staff"] = user.is_staff
+        token["is_active"] = user.is_active
+
+        return token
+
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,16 +62,18 @@ class BookSerializer(serializers.ModelSerializer):
         if not (request and request.user and request.user.is_staff):
             # If user is not admin, remove the permission_field field
             self.fields.pop("permission_field", None)
-            
+
         if request:
-            include_summary = request.query_params.get("summary").lower() == "true"
+            include_summary = (
+                request.query_params.get("summary", "false").lower() == "true"
+            )
             if not include_summary:
                 self.fields.pop("summary", None)
-    
+
     def get_permission_field(self, obj):
         # Provide extra info only if required
         return f"Sensitive details for {obj.title}"
-    
+
     def get_summary(self, obj):
         return f"{obj.title} was published on {obj.date_published}"
 
