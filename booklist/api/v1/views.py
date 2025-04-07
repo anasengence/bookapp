@@ -29,6 +29,18 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 
+class DeprecationMixin:
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        # Check if the version is v1; if so, add a deprecation header.
+        print(request)
+        if self.request.version == "v1":
+            response["X-API-Warning"] = (
+                "API version v1 is deprecated and will be removed in a future release. Please migrate to v2."
+            )
+        return response
+
+
 class ValidateToken(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -93,7 +105,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 #    - Configure DefaultRouter and register your ViewSets
 
 
-class AuthorViewSet(viewsets.ModelViewSet):
+class AuthorViewSet(DeprecationMixin, viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     filter_backends = [SearchFilter, OrderingFilter]
@@ -104,7 +116,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
 
-class BookViewSet(viewsets.ModelViewSet):
+class BookViewSet(DeprecationMixin, viewsets.ModelViewSet):
     # queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend, CustomFilterBackend]
@@ -156,7 +168,7 @@ class BookViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(DeprecationMixin, viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = CustomPageNumberPagination
