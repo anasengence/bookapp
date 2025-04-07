@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "booklist",
     "django_filters",
     "rest_framework_simplejwt.token_blacklist",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -135,6 +136,11 @@ REST_FRAMEWORK = {
         # "rest_framework.authentication.BasicAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    # "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSION": "v1",
+    "ALLOWED_VERSIONS": ("v1", "v2", "default"),
+    "VERSION_PARAM": "version",
 }
 
 SIMPLE_JWT = {
@@ -145,7 +151,7 @@ SIMPLE_JWT = {
 }
 
 ALLOWED_IPS = [
-    '192.168.1.0/24',  # Local network
-    '10.0.0.0/8',      # Private network
-    '127.0.0.1/32',    # Localhost
+    "192.168.1.0/24",  # Local network
+    "10.0.0.0/8",  # Private network
+    "127.0.0.1/32",  # Localhost
 ]

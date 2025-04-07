@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 
-from booklist.api.filter import BookFilter, CustomFilterBackend
-from ..models import Book, Author, Genre
+from booklist.api.v1.filter import BookFilter, CustomFilterBackend
+from ...models import Book, Author, Genre
 from rest_framework import viewsets
 from .serializers import (
     BookSerializer,

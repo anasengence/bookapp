@@ -1,5 +1,5 @@
 from datetime import date
-from ..models import Book
+from ...models import Book
 from rest_framework import filters
 import django_filters
 

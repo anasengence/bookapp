@@ -1,6 +1,6 @@
 from datetime import date
 from rest_framework import serializers
-from ..models import Book, Author, Genre
+from ...models import Book, Author, Genre
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -18,15 +18,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    api_version = serializers.SerializerMethodField()
+
     class Meta:
         model = Genre
         fields = "__all__"
+
+    def get_api_version(self, obj):
+        return 2
 
 
 class AuthorSerializer(serializers.ModelSerializer):
     author_books = serializers.HyperlinkedRelatedField(
         many=True, read_only=True, view_name="get-books-detail"
     )
+    api_version = serializers.SerializerMethodField()
 
     # author_books = serializers.StringRelatedField(many=True, read_only=True)
 
@@ -35,6 +41,9 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = "__all__"
         # fields = ["id", "name", "bio", "date_of_birth", "author_books"]
         # depth = 1
+
+    def get_api_version(self, obj):
+        return 2
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -50,6 +59,7 @@ class BookSerializer(serializers.ModelSerializer):
     )
     permission_field = serializers.SerializerMethodField()
     summary = serializers.SerializerMethodField()
+    api_version = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -81,6 +91,9 @@ class BookSerializer(serializers.ModelSerializer):
     #     days = date.today() - obj.date_published
     #     return days.days
 
+    def get_api_version(self, obj):
+        return 2
+
     def validate(self, obj):
         if obj["title"] == obj["author"].name:
             raise serializers.ValidationError(
@@ -99,7 +112,7 @@ class BookListSerializer(BookSerializer):
 
     class Meta(BookSerializer.Meta):
         model = Book
-        fields = ["id", "title", "author_name", "date_published"]
+        fields = ["id", "title", "author_name", "date_published", "api_version"]
 
 
 # Serializer for detail view (more fields and nested representation)

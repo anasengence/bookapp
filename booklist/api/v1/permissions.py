@@ -1,7 +1,5 @@
-from ipaddress import ip_address, ip_network
-from django.conf import settings
 from rest_framework import permissions
-from booklist.models import Blocklist
+# from booklist.models import Blocklist
 
 
 class IsOwner(permissions.BasePermission):
@@ -26,9 +24,9 @@ class IsRegularUser(permissions.BasePermission):
         )
 
 
-class BlocklistPermission(permissions.BasePermission):
+# class BlocklistPermission(permissions.BasePermission):
 
-    def has_permission(self, request, view):
-        ip_addr = request.META["REMOTE_ADDR"]
-        blocked = Blocklist.objects.filter(ip_addr=ip_addr).exists()
-        return not blocked
+#     def has_permission(self, request, view):
+#         ip_addr = request.META["REMOTE_ADDR"]
+#         blocked = Blocklist.objects.filter(ip_addr=ip_addr).exists()
+#         return not blocked
