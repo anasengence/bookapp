@@ -9,4 +9,4 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
             if user_auth is not None:
                 request.user, request.auth = user_auth
         except (InvalidToken, TokenError):
-            raise InvalidToken("Invalid token by Middleware")
+            raise InvalidToken(">>>>>>>>>>>>>>Invalid token by Middleware<<<<<<<<<<<<<")

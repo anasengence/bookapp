@@ -1,10 +1,34 @@
 from datetime import date
 from django.urls import reverse
 from django.test import TestCase
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 from .models import Author, Book, Genre
 from .api.serializers import BookSerializer
+from django.contrib.auth.models import User
+
+class PermissionTests(APITestCase):
+    def setUp(self):
+        self.admin = User.objects.create_superuser('admin', 'admin@test.com', 'password')
+        self.staff = User.objects.create_user('staff', 'staff@test.com', 'password', is_staff=True)
+        self.user = User.objects.create_user('user', 'user@test.com', 'password')
+        self.book = Book.objects.create(title="Test Book")
+
+    def test_owner_permission(self):
+        client = APIClient()
+        client.force_authenticate(user=self.user)
+        response = client.patch(f'/books/{self.book.id}/', {'title': 'New Title'})
+        self.assertEqual(response.status_code, 200)
+
+    def test_field_permissions(self):
+        client = APIClient()
+        client.force_authenticate(user=self.staff)
+        response = client.get(f'/books/{self.book.id}/')
+        self.assertIn('price', response.data)  # Staff can see price
+        
+        client.force_authenticate(user=self.user)
+        response = client.get(f'/books/{self.book.id}/')
+        self.assertNotIn('price', response.data)  # Regular user can't see price
 
 
 class BookSerializerTestCase(TestCase):
@@ -80,7 +104,7 @@ class AuthorViewTestCase(TestCase):
         self.book.genre.add(genre)
 
     def test_get_authors(self):
-        url = reverse("get_authors")
+        url = reverse("get-authors")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(
@@ -88,7 +112,7 @@ class AuthorViewTestCase(TestCase):
         )
 
     def test_create_author(self):
-        url = reverse("get_authors")
+        url = reverse("get-authors")
         data = {
             "name": "Anas tahir",
             "bio": "here we go",

@@ -15,6 +15,7 @@ from .serializers import (
     CustomTokenObtainPairSerializer,
     GenreSerializer,
 )
+from .permissions import IsOwner, IsAdminUser, IsStaffUser, IsRegularUser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .pagination import (
@@ -40,9 +41,10 @@ class ValidateToken(APIView):
             }
         )
 
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-    
+
 
 # @api_view(["GET"])
 # def getBooks(request):
@@ -99,7 +101,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
     ordering_fields = ["date_of_birth"]
     ordering = ["date_of_birth"]
     pagination_class = CustomLimitOffsetPagination
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -108,6 +110,12 @@ class BookViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, CustomFilterBackend]
     filterset_fields = ["date_published"]
     filterset_class = BookFilter
+    # permission_classes = [IsAuthenticated, IsOwner]
+    field_permissions = {
+        "title": IsRegularUser,
+        "author": IsAdminUser,
+        "genre": IsStaffUser,
+    }
 
     def get_queryset(self):
         queryset = Book.objects.all().select_related("author").prefetch_related("genre")
@@ -149,6 +157,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    queryset = Genre.objects.all().prefetch_related("books")
+    queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = CustomPageNumberPagination
+    permission_classes = [IsAuthenticated, IsRegularUser]
