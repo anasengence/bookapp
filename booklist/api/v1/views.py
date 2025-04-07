@@ -33,7 +33,7 @@ class DeprecationMixin:
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
         # Check if the version is v1; if so, add a deprecation header.
-        print(request)
+        # print(request)
         if self.request.version == "v1":
             response["X-API-Warning"] = (
                 "API version v1 is deprecated and will be removed in a future release. Please migrate to v2."
@@ -113,7 +113,8 @@ class AuthorViewSet(DeprecationMixin, viewsets.ModelViewSet):
     ordering_fields = ["date_of_birth"]
     ordering = ["date_of_birth"]
     pagination_class = CustomLimitOffsetPagination
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    # permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
 
 class BookViewSet(DeprecationMixin, viewsets.ModelViewSet):

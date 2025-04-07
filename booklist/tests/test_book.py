@@ -5,9 +5,10 @@ from django.urls import reverse
 from ..models import Author, Book, Genre
 from datetime import date
 from django.contrib.auth.models import User
+from .mixins import AuthMixin
 
 
-class BookAPITestCase(APITestCase):
+class BookAPITestCase(AuthMixin, APITestCase):
     def setUp(self):
         self.genre = Genre.objects.create(name="Fiction")
         self.author = Author.objects.create(
@@ -17,6 +18,7 @@ class BookAPITestCase(APITestCase):
             title="Test Book", author=self.author, date_published=date(2023, 1, 1)
         )
         self.book.genre.add(self.genre)
+        self.user = User.objects.create_user(username="testuser", password="pass123")
 
     def test_get_books(self):
         url = reverse("v1:books-list")  # DRF appends -list to the basename
@@ -42,3 +44,10 @@ class BookAPITestCase(APITestCase):
         url = reverse("v1:authors-list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 401)
+
+    def test_authenticated_access(self):
+        # Authenticate using JWT token
+        self.authenticate(self.client, self.user)
+        url = reverse("v1:authors-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

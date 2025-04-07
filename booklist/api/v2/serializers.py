@@ -30,7 +30,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class AuthorSerializer(serializers.ModelSerializer):
     author_books = serializers.HyperlinkedRelatedField(
-        many=True, read_only=True, view_name="get-books-detail"
+        many=True, read_only=True, view_name="books-detail"
     )
     api_version = serializers.SerializerMethodField()
 
