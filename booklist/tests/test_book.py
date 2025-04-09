@@ -82,7 +82,7 @@ class BookAPITestCase(AuthMixin, APITestCase):
         """
         # Ensure url is a clean path for resolution
         clean_url = url.split("?")[0]
-        print(f"Resolving URL: {clean_url}")  # Debug output
+        # print(f"Resolving URL: {clean_url}")  # Debug output
         view_info = resolve(clean_url)
         view = view_info.func
         request.method = request.META["REQUEST_METHOD"]
