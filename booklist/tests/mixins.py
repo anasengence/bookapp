@@ -8,3 +8,4 @@ class AuthMixin:
         access_token = str(refresh.access_token)
         # Set the token in the client's Authorization header
         client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        return access_token
